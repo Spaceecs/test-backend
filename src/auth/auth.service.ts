@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service'
 import * as bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt'
@@ -18,10 +18,10 @@ export class AuthService {
 
   async login(email: string, password: string) {
     const user = await this.prisma.user.findUnique({ where: { email } })
-    if (!user) throw new Error('User not found')
+    if (!user) throw new HttpException('User not found', HttpStatus.UNAUTHORIZED)
 
     const valid = await bcrypt.compare(password, user.password)
-    if (!valid) throw new Error('Invalid password')
+    if (!valid) throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED)
 
     const token = this.jwt.sign({ sub: user.id })
     return { access_token: token }

@@ -11,6 +11,7 @@ export class JwtAuthGuard implements CanActivate {
     if (!authHeader) return false
 
     const token = authHeader.split(' ')[1]
+
     try {
       const payload = this.jwt.verify(token)
       req.user = { userId: payload.sub }
